@@ -1,69 +1,130 @@
-import React, { useEffect, useState } from 'react'
-import Searchbar from '../../Components/Searchbar/Searchbar'
-import { useParams } from 'react-router-dom'
-import { movieData } from '../../apiFunctions'
+import React, { useEffect, useRef, useState } from 'react'
+import { Link, useParams } from 'react-router-dom'
+import { fetchCastData, movieData } from '../../apiFunctions'
 import { FaGithub } from "react-icons/fa6";
 import htmlParser from 'html-react-parser';
 function MoviePage() {
     const [data,setData]=useState(null)
+    const dialogRef=useRef(null)
     const {showId}=useParams()
+    const [formData,setFormData]=useState(null)
     const fillData=async()=>{
         const res = await movieData(showId)
-        console.log(res)
         if(res){
             setData(res)
         }
     }
+    const fillCastData=async ()=>{
+        const res = await fetchCastData(showId)
+        if(res){
+
+            setCastData([...res])
+        }
+    }
+    const [castData,setCastData]=useState(null)
+
     useEffect(()=>{
         fillData()
+        fillCastData()
     },[showId])
   return (
-    <div className='min-vh-100'>
+    <div className='min-vh-100 '>
         <header className='mb-3'>
             <nav className="navbar navbar-expand-md navbar-light bg-light border px-3 d-flex justify-content-between text-center">
-                <h1 className="navbar-brand ">Movie List</h1>
-                <Searchbar/>
+                <Link to={"/"} className=' text-decoration-none'>
+                    <h1 className="navbar-brand">Movie List</h1>
+                </Link>
             </nav>
         </header>
-        <div style={{minHeight:"85vh"}}
-            className='px-3 d-flex'
+        <div style={{minHeight:"70vh"}}
+            className=' d-flex px-3 gap-3'
         >
             <div
-                
+                style={{
+                    height: '500px',
+                    width : "400px",
+                    backgroundColor:"grey"
+                }}
+                className='overflow-hidden flex-shrink-0'
             >
                 {
-                    data?.imageUrlMedium &&
-                    <img src={data.imageUrlMedium} alt="" />
+                    data?.imageUrlOriginal &&
+                    <img src={data.imageUrlOriginal} alt="" 
+                        className='h-100 w-100 object-fit-cover'
+                    />
                 }
             </div>
             <div>
-                <h1>{data?.name}</h1>
-                <span>{data?.rating}</span>
-                <div>
-                    {data?.summary
-                        &&
-                        htmlParser(data.summary)
-                    }
+                <div className='d-flex align-items-end gap-1'>
+                    <h1 className='text-capitalize mb-0'>{data?.name}</h1>
+                    <span className='pb-1'>{data?.rating || "No Rating"}</span>
                 </div>
                 <div>
-                    <p>
-                        <span>Language</span>
+                    <h4 className='h5 mt-4 mb-3 italic fw-bold'>Plot | Summary</h4>
+                    <div
+                        style={{lineHeight:"1.8rem"}}
+                    >
+                        {data?.summary
+                            &&
+                            htmlParser(data.summary)
+                        }
+                    </div>
+                </div>
+                <div>
+                    <p >
+                        <span className='fw-bold'>Language : </span>
                         <span>{data?.language}</span>
                     </p>
-                    <p>
-                        <span>Genres</span>
+                    <p >
+                        <span className='fw-bold'>Genres : </span>
                         {
                             (data && data.genres) &&
-                            data?.genres.map(i=>(
-                                <span key={i}>{i}</span>
-                            ))
+                            data?.genres.join(", ")
                         }
                     </p>
                 </div>
+                <button className='btn btn-primary'
+                    disabled={data?false:true}
+                    onClick={()=>{
+                        setFormData(
+                            {
+                                movieName : data.name,
+                                language: data.language,
+                                name: "",
+                                age: "",
+                                location: "",
+                                creditCard: ""
+                            }
+                        )
+                        dialogRef.current.showModal()
+                    }}
+                >Book Now</button>
             </div>
         </div>
-        <div>
-            {/* cast */}
+        <div className='px-3 mt-2'>
+            <hr />
+            <h3 className='fw-bold h2'>Cast</h3>
+            <div 
+                className='d-flex gap-3 flex-wrap'
+            >
+                {
+                    castData &&
+                    castData.map((i,index)=>(
+                        <div key={index} className="card flex-shrink-0 rounded overflow-hidden ">
+                            <div style={{width:"150px",height:"210px", background:"grey"}} >
+                                {
+                                    i.imageUrl &&
+                                    <img src={i.imageUrl} className="card-img-top" alt="..." />
+                                }
+                            </div>
+                            <div className="card-body" style={{width:"150px"}}>
+                                <p className='card-title wrap text-primary'>{i.name}</p>
+                                <p className='card-text'>{i.role}</p>
+                            </div>
+                        </div>
+                    ))
+                }
+            </div>
         </div>
         <div>
             {/* recommended for you */}
@@ -81,6 +142,51 @@ function MoviePage() {
                 </li>
             </ul>
         </footer>
+
+        <dialog 
+            ref={dialogRef}
+        >
+            {
+                formData &&
+                <form >
+                    <h1>Book Tickets Now</h1>
+                    <h5>Movie Info</h5>
+                    <hr />
+                    <div>
+                        <span>Movie Name</span>
+                        <input type="text" 
+                            value={formData.movieName}
+                            disabled={true}
+                        />
+                    </div>
+                    <div>
+                        <span>Language</span>
+                        <input type="text" 
+                            value={formData.language}
+                            disabled={true}
+                        />
+                    </div>
+                    <h5>Customer Info</h5>
+                    <hr />
+                    <div>
+                        <span>Name</span>
+                        <input type="text" 
+                            value={formData.name}
+                            onChange={(e)=>setFormData(prev=>{return {...prev,name:e.target.value}})}
+                            placeholder='Enter Your Name'
+                        />
+                    </div>
+                    <div>
+                        <span>Age</span>
+                        <input type="text" 
+                            value={formData.age}
+                            onChange={(e)=>setFormData(prev=>{return {...prev,age:e.target.value}})}
+                            placeholder='Enter Your Age'
+                        />
+                    </div>
+                </form>
+            }
+        </dialog>
     </div>
   )
 }

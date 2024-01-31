@@ -1,5 +1,4 @@
 import React, { useEffect, useState } from 'react'
-import Searchbar from '../../Components/Searchbar/Searchbar'
 import Card from '../../Components/Card/Card'
 import { movieList } from '../../apiFunctions'
 import { FaGithub } from "react-icons/fa6";
@@ -22,9 +21,6 @@ function Home() {
             <h1 className="display-5 fw-bold text-body-emphasis text-align">Movie List</h1>
             <div className="col-lg-6 mx-auto">
             <p className="lead mb-4">Your go to website for movie query</p>
-            <div className="d-grid gap-2 d-sm-flex justify-content-sm-center">
-                <Searchbar/>
-            </div>
             </div>
         </header>
         <div
