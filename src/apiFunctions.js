@@ -22,3 +22,24 @@ export const movieList=async ()=>{
     }
     return false
 }
+export const movieData=async (id)=>{
+    const apiURL=baseUrl+"/shows/"+id
+    try{
+        const res=await fetch(apiURL)
+        if(res){
+            const data=await res.json()
+            return {
+                name: data.name,
+                language: data.language,
+                rating: data.rating.average,
+                imageUrlMedium : data.image.medium,
+                summary: data.summary,
+                genres: data.genres
+            }
+        }
+    }catch(error){
+        console.log(error)
+        return false
+    }
+    return false
+}
