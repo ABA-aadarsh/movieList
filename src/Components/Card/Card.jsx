@@ -25,7 +25,8 @@ function Card({data}) {
                     right:"0px",
                     background:"yellow",
                     borderRadius:"2px 0px 0px 0px",
-                    letterSpacing:"1px"
+                    letterSpacing:"1px",
+                    zIndex:3
                 }}
             >{rating || "No Rating"}</p>
         </div>
