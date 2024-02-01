@@ -9,7 +9,7 @@ function Footer() {
 
             <ul className="nav col-md-4 justify-content-end list-unstyled d-flex mx-3">
                 <li className="ms-3">
-                    <a className="text-muted" href="#">
+                    <a className="text-muted" href="https://github.com/ABA-aadarsh">
                         <FaGithub />
                     </a>
                 </li>
