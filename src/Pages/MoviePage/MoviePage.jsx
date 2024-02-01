@@ -1,8 +1,10 @@
 import React, { useEffect, useRef, useState } from 'react'
 import { Link, useParams } from 'react-router-dom'
 import { fetchCastData, movieData } from '../../apiFunctions'
-import { FaGithub } from "react-icons/fa6";
+import {IoMdClose} from "react-icons/io"
 import htmlParser from 'html-react-parser';
+import style from "./MoviePage.module.css"
+import Footer from '../../Components/Footer/Footer';
 function MoviePage() {
     const [data,setData]=useState(null)
     const dialogRef=useRef(null)
@@ -22,41 +24,58 @@ function MoviePage() {
         }
     }
     const [castData,setCastData]=useState(null)
-
+    const formSubmissionHandler=(e)=>{
+        e.preventDefault()
+        console.log(formData)
+        // form validation code here
+        localStorage.setItem("bookTicketData",JSON.stringify(formData))
+    }
     useEffect(()=>{
         fillData()
         fillCastData()
     },[showId])
   return (
-    <div className='min-vh-100 '>
+    <div>
         <header className='mb-3'>
-            <nav className="navbar navbar-expand-md navbar-light bg-light border px-3 d-flex justify-content-between text-center">
-                <Link to={"/"} className=' text-decoration-none'>
-                    <h1 className="navbar-brand">Movie List</h1>
+            <nav className="navbar navbar-expand-md navbar-light bg-light border px-3 ">
+                <Link to={"/"} className=' text-decoration-none d-flex gap-1 align-items-center'>
+                    <div className="d-block bg-primary" 
+                        style={{
+                            width:"30px",height:"30px", borderRadius:"50%"
+                        }}
+                    ></div>
+                    <h1 className="navbar-brand m-0">Ticket Booker</h1>
                 </Link>
             </nav>
         </header>
         <div style={{minHeight:"70vh"}}
-            className=' d-flex px-3 gap-3'
+            className={' d-flex px-3 gap-3 '+style.container}
         >
             <div
                 style={{
                     height: '500px',
                     width : "400px",
-                    backgroundColor:"grey"
+                    backgroundColor:"grey",
+                    flexShrink:"0",
+                    position:"relative"
                 }}
-                className='overflow-hidden flex-shrink-0'
+                className={'overflow-hidden '+style.imageContainer}
+
             >
                 {
                     data?.imageUrlOriginal &&
                     <img src={data.imageUrlOriginal} alt="" 
                         className='h-100 w-100 object-fit-cover'
+                        style={{
+                            position:"relative",
+                            zIndex:2
+                        }}
                     />
                 }
             </div>
             <div>
-                <div className='d-flex align-items-end gap-1'>
-                    <h1 className='text-capitalize mb-0'>{data?.name}</h1>
+                <div className={'d-flex align-items-end gap-1 '+style.movieTitle}>
+                    <h1 className={'text-capitalize mb-0 '}>{data?.name}</h1>
                     <span className='pb-1'>{data?.rating || "No Rating"}</span>
                 </div>
                 <div>
@@ -93,7 +112,8 @@ function MoviePage() {
                                 name: "",
                                 age: "",
                                 location: "",
-                                creditCard: ""
+                                paymentMethod: "Paytm",
+                                paymentID:""
                             }
                         )
                         dialogRef.current.showModal()
@@ -105,10 +125,10 @@ function MoviePage() {
             <hr />
             <h3 className='fw-bold h2'>Cast</h3>
             <div 
-                className='d-flex gap-3 flex-wrap'
+                className='col-12 d-flex gap-3 flex-wrap justify-content-sm-start justify-content-center'
             >
                 {
-                    castData &&
+                    castData ?
                     castData.map((i,index)=>(
                         <div key={index} className="card flex-shrink-0 rounded overflow-hidden ">
                             <div style={{width:"150px",height:"210px", background:"grey"}} >
@@ -122,68 +142,122 @@ function MoviePage() {
                                 <p className='card-text'>{i.role}</p>
                             </div>
                         </div>
-                    ))
+                    )):
+                    <><span>Cast Data Not Found</span></>
                 }
             </div>
         </div>
         <div>
             {/* recommended for you */}
         </div>
-        <footer className="d-flex flex-wrap justify-content-between align-items-center py-3 mt-4 border-top px-3">
-            <div className="col-md-4 d-flex align-items-center">
-            <span className="mb-3 mb-md-0 text-muted">Assignment Project by Aadarsh</span>
-            </div>
-
-            <ul className="nav col-md-4 justify-content-end list-unstyled d-flex mx-3">
-                <li className="ms-3">
-                    <a className="text-muted" href="#">
-                        <FaGithub/>
-                    </a>
-                </li>
-            </ul>
-        </footer>
-
+        
+        
+        <Footer/>
         <dialog 
             ref={dialogRef}
+            className={'border-0 bg-white text-black px-3 py-2 rounded '+style.dialogBox}
         >
             {
                 formData &&
-                <form >
-                    <h1>Book Tickets Now</h1>
-                    <h5>Movie Info</h5>
+                <form 
+                    onSubmit={formSubmissionHandler}
+                >
+                    <div className='d-flex gap-4 align-items-center my-3'>
+                        <h1 className='h2 ls-1 flex-grow-1 ps-2 text-primary'>Book Tickets Now</h1>
+                        <button style={{fontSize:"18px"}} className='bg-transparent text-black border-0 d-flex align-items-center justify-center'
+                            onClick={()=>{
+                                dialogRef.current.close()
+                            }}
+                        ><IoMdClose/></button>
+                    </div>
+                    <h6 className='text-secondary'
+                        style={{letterSpacing:"1px"}}
+                    >Movie Info</h6>
+                    <hr />
+                    <div className='d-flex gap-3 flex-wrap mb-2'>
+                        <div className='d-flex flex-column gap-1 mb-3'>
+                            <span >Movie Name</span>
+                            <input type="text" 
+                                value={formData.movieName}
+                                disabled={true}
+                                className='px-2 disabled border-1'
+                                style={{backgroundColor:"#d3cfcf",color:"#5e5757",borderRadius:"2px"}}
+                            />
+                        </div>
+                        <div className='d-flex flex-column gap-1 mb-3'>
+                            <span>Language</span>
+                            <input type="text" 
+                                value={formData.language}
+                                disabled={true}
+                                className='px-2 disabled border-1'
+                                style={{backgroundColor:"#d3cfcf",color:"#5e5757",borderRadius:"2px"}}
+                            />
+                        </div>
+                    </div>
+                    <h6 className='text-secondary'
+                    style={{letterSpacing:"1px"}}
+                    >Customer Info</h6>
                     <hr />
                     <div>
-                        <span>Movie Name</span>
-                        <input type="text" 
-                            value={formData.movieName}
-                            disabled={true}
-                        />
+                        <div className='d-flex gap-2 align-items-center flex-wrap my-3'>
+                            <span style={{width:"65px"}}>Name</span>
+                            <input type="text" 
+                                value={formData.name}
+                                onChange={(e)=>setFormData(prev=>{return {...prev,name:e.target.value}})}
+                                className='flex-grow-1 bg-white border-1 text-black ps-2'
+                                placeholder='Enter Your Name'
+                            />
+                        </div>
+                        <div className='d-flex gap-2 align-items-center flex-wrap my-3'>
+                            <span style={{width:"65px"}}>Age</span>
+                            <input type="number" 
+                                value={formData.age}
+                                onChange={(e)=>setFormData(prev=>{return {...prev,age:e.target.value}})}
+                                className='flex-grow-1 bg-white border-1 text-black ps-2'
+                                placeholder='Enter Your Age'
+                            />
+                        </div>
+                        <div className='d-flex gap-2 align-items-center flex-wrap my-3'>
+                            <span style={{width:"65px"}}>Location</span>
+                            <input type="text" 
+                                value={formData.location}
+                                onChange={(e)=>setFormData(prev=>{return {...prev,location:e.target.value}})}
+                                className='flex-grow-1 bg-white border-1 text-black ps-2'
+                                placeholder='Enter Your Name'
+                            />
+                        </div>
+                        <div className='d-flex gap-3 align-items-center flex-wrap my-3'>
+                            <span >Select Payment Method</span>
+                            <select onChange={(e)=>{
+                                setFormData(prev=>{return {...prev,paymentMethod: e.target.value,paymentID:""}})
+                            }}
+                                className='border-1 rounded px-2 py-1'
+                                style={{
+                                    backgroundColor:"white",
+                                    color:"black"
+                                }}
+                                value={formData.paymentMethod}
+                            >
+                                {
+                                    ["PayPal","Paytm","PhonePay"].map(i=>(
+                                        <option value={i} key={i} >{i}</option>
+                                    ))
+                                }
+                            </select>
+                        </div>
+                        <div className='d-flex gap-3 align-items-center flex-wrap my-3'>
+                            <span >Payment ID</span>
+                            <input type="text" 
+                                value={formData.paymentID}
+                                onChange={(e)=>setFormData(prev=>{return {...prev,paymentID:e.target.value}})}
+                                className='flex-grow-1 bg-white border-1 text-black ps-2'
+                                placeholder='Enter Your Payment ID number'
+                                disabled={formData.paymentMethod==""}
+                            />
+                        </div>
                     </div>
-                    <div>
-                        <span>Language</span>
-                        <input type="text" 
-                            value={formData.language}
-                            disabled={true}
-                        />
-                    </div>
-                    <h5>Customer Info</h5>
-                    <hr />
-                    <div>
-                        <span>Name</span>
-                        <input type="text" 
-                            value={formData.name}
-                            onChange={(e)=>setFormData(prev=>{return {...prev,name:e.target.value}})}
-                            placeholder='Enter Your Name'
-                        />
-                    </div>
-                    <div>
-                        <span>Age</span>
-                        <input type="text" 
-                            value={formData.age}
-                            onChange={(e)=>setFormData(prev=>{return {...prev,age:e.target.value}})}
-                            placeholder='Enter Your Age'
-                        />
-                    </div>
+                    <button className='btn-primary btn my-2' type='submit'
+                    >Confirm to Book</button>
                 </form>
             }
         </dialog>

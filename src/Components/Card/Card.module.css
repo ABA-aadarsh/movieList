@@ -9,3 +9,11 @@
     transform: scale(1);
     transition: transform 0.3s linear;
 }
+.imageContainer::before{
+    content: "No-Image";
+    position: absolute;
+    left: 50%;
+    top: 50%;
+    z-index: 1;
+    transform: translate(-50%, -50%);
+}

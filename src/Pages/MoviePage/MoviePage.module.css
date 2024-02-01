@@ -1,0 +1,33 @@
+
+.imageContainer::before{
+    content: "No-Image";
+    position: absolute;
+    left: 50%;
+    top: 50%;
+    z-index: 1;
+    transform: translate(-50%, -50%);
+}
+@media only screen and (max-width: 1000px) {
+    .container{
+        flex-direction: column;
+    }
+    .imageContainer{
+        margin: auto;
+    }
+    .movieTitle{
+        justify-content: center;
+    }
+}
+@media only screen and (max-width: 600px) {
+    .imageContainer{
+        width: 360px !important;
+    }
+}
+@media only screen and (max-width: 380px) {
+    .imageContainer{
+        width: 300px !important;
+    }
+}
+.dialogBox::backdrop{
+    background-color: #5d67649c;
+}
